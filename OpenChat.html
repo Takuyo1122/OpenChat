@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rain Chat</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <link rel="stylesheet" href="OpenChat.css">
+  <script src="OpenChat.js" defer></script>
+</head>
+<body>
+
+  <canvas id="rainCanvas"></canvas>
+
+  <div class="chat-box">
+    <input type="text" id="message" placeholder="Type a message...">
+    <button class="send-btn" id="sendBtn">Send</button>
+  </div>
+
+  <script>
+    // === 🌧️ 雨のCanvas背景 ===
+    const canvas = document.getElementById("rainCanvas");
+    const ctx = canvas.getContext("2d");
+    let drops = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resizeCanvas);
+    resizeCanvas();
+
+    function createRain() {
+      drops = [];
+      for (let i = 0; i < 100; i++) {
+        drops.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          speed: Math.random() * 2 + 1,
+          length: Math.random() * 20 + 10
+        });
+      }
+    }
+
+    function drawRain() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = "rgba(173, 216, 230, 0.7)";
+      ctx.lineWidth = 1;
+
+      drops.forEach(drop => {
+        ctx.beginPath();
+        ctx.moveTo(drop.x, drop.y);
+        ctx.lineTo(drop.x, drop.y + drop.length);
+        ctx.stroke();
+
+        drop.y += drop.speed;
+        if (drop.y > canvas.height) drop.y = 0;
+      });
+
+      requestAnimationFrame(drawRain);
+    }
+
+    createRain();
+    drawRain();
+
+    // === ⚡ 送信時のエネルギーアニメーション ===
+    document.getElementById("sendBtn").addEventListener("click", () => {
+      const messageInput = document.getElementById("message");
+
+      if (messageInput.value.trim() === "") return;
+
+      // 送信ボタンの位置を取得
+      const button = document.getElementById("sendBtn");
+      const rect = button.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      // 💧 雨粒を中央に引き寄せる
+      gsap.to(drops, {
+        duration: 0.5,
+        x: centerX,
+        y: centerY,
+        opacity: 0,
+        ease: "power2.in"
+      });
+
+      // 💥 送信アニメーション
+      gsap.fromTo(
+        button,
+        { scale: 1 },
+        { scale: 1.3, duration: 0.1, yoyo: true, repeat: 1, ease: "power2.out" }
+      );
+
+      // メッセージをリセット
+      setTimeout(() => {
+        messageInput.value = "";
+        createRain(); // 雨をリセットして再開
+      }, 600);
+    });
+  </script>
+
+</body>
+</html>

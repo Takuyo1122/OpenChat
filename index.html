@@ -76,15 +76,6 @@
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
 
-      // 💧 雨粒を中央に引き寄せる
-      gsap.to(drops, {
-        duration: 0.5,
-        x: centerX,
-        y: centerY,
-        opacity: 0,
-        ease: "power2.in"
-      });
-
       // 💥 送信アニメーション
       gsap.fromTo(
         button,
